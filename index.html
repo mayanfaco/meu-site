@@ -688,6 +688,32 @@ window.__resources = {
       </div>
     </div>
 
+    <!-- ── CATEGORIA 6: Motion Graphic ── -->
+    <div style="margin-top:80px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#c5ff47;text-transform:uppercase;border:1px solid rgba(197,255,71,0.25);border-radius:100px;padding:6px 18px;">Motion Graphic</span>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <sc-for list="{{ motionDots }}" as="dot" hint-placeholder-count="1">
+            <div onclick="{{ dot.onClick }}" style="width:7px;height:7px;border-radius:50%;background:{{ dot.bg }};cursor:pointer;transition:background 0.2s;"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border-radius:16px;overflow:hidden;border:1px solid #1a1a1a;background:#0a0a0a;">
+        {{ motionVideo }}
+        <div style="padding:20px 24px;border-top:1px solid #161616;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div>
+            <p style="font-size:10px;font-weight:700;letter-spacing:0.2em;color:#c5ff47;text-transform:uppercase;margin-bottom:4px;">{{ currentMotion.label }} · {{ currentMotion.client }}</p>
+            <h3 style="font-size:17px;font-weight:700;color:#f0f0f0;line-height:1.2;margin-bottom:6px;">{{ currentMotion.title }}</h3>
+            <p style="font-size:12px;color:#444;line-height:1.7;max-width:520px;">{{ currentMotion.desc }}</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button onclick="{{ prevMotion }}" style="width:38px;height:38px;background:none;border:1px solid #222;border-radius:50%;color:#555;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;" style-hover="border-color:#555;color:#f0f0f0;">←</button>
+            <button onclick="{{ nextMotion }}" style="width:38px;height:38px;background:none;border:1px solid #222;border-radius:50%;color:#555;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;" style-hover="border-color:#555;color:#f0f0f0;">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -816,7 +842,7 @@ window.__resources = {
 </x-dc>
 <script type="text/x-dc" data-dc-script="">
 class Component extends DCLogic {
-  state = { nome: '', contato: '', selecionados: {}, ci: { sites: 0, id: 0, ig: 0, ev: 0, cat: 0 } };
+  state = { nome: '', contato: '', selecionados: {}, ci: { sites: 0, id: 0, ig: 0, ev: 0, cat: 0, motion: 0 } };
 
   _ei(item, sel) {
     const on = !!sel[item.id];
@@ -869,6 +895,11 @@ class Component extends DCLogic {
         { id:'banner-imp',    nome:'Banner para Impressão',                 desc:'Arquivo em alta resolução pronto para gráfica',                         preco:250  },
         { id:'catalogo',      nome:'Catálogo ou Folder',                    desc:'Layout editorial de até 8 páginas com identidade do cliente',           preco:350  },
         { id:'pack-impressos',nome:'Pack Materiais Impressos',               desc:'Cartão + flyer + banner — desconto combinado',                          preco:400  },
+      ].map(ei) },
+      { titulo: 'Motion Graphic', itens: [
+        { id:'motion-15s', nome:'Motion Graphic 15s', desc:'Animação simples sem áudio e sem locução, arquivo MP4', preco:500  },
+        { id:'motion-30s', nome:'Motion Graphic 30s', desc:'Animação simples sem áudio e sem locução, arquivo MP4', preco:800  },
+        { id:'motion-45s', nome:'Motion Graphic 45s', desc:'Animação simples sem áudio e sem locução, arquivo MP4', preco:1200 },
       ].map(ei) },
       { titulo: 'Apresentações & Digital', itens: [
         { id:'pitch',         nome:'Apresentação Comercial (Pitch Deck)',   desc:'8–12 slides, hierarquia visual, PDF e PPTX editável, 1 ajuste',        preco:900  },
@@ -928,6 +959,9 @@ class Component extends DCLogic {
       { name:'Roteiro de Viagem Ilustrado',        price:'400',   note:' · até 15 páginas', deliveries:'Arte personalizada com destinos, datas e atividades, formato mapa ou cronograma ilustrado, paleta combinada com o cliente, PDF de alta resolução.' },
       { name:'E-mail Marketing',                   price:'350',   note:'', deliveries:'Layout de 1 campanha completa, hierarquia visual com CTA, versão desktop e mobile, arquivo HTML ou imagem otimizada para disparo.' },
       { name:'Convite Digital',                    price:'250',   note:'', deliveries:'Layout personalizado para o evento, versão otimizada para WhatsApp e Instagram, até 2 variações de cor ou layout, PNG de alta qualidade, 1 rodada de ajustes.' },
+      { name:'Motion Graphic',                     price:'500',   note:' · 15 segundos', deliveries:'Animação gráfica de 15 segundos, motion simples sem áudio e sem locução, arquivo MP4 pronto para redes sociais.' },
+      { name:'Motion Graphic',                     price:'800',   note:' · 30 segundos', deliveries:'Animação gráfica de 30 segundos, motion simples sem áudio e sem locução, arquivo MP4 pronto para redes sociais.' },
+      { name:'Motion Graphic',                     price:'1.200', note:' · 45 segundos', deliveries:'Animação gráfica de 45 segundos, motion simples sem áudio e sem locução, arquivo MP4 pronto para redes sociais.' },
     ];
 
     const ci = this.state.ci;
@@ -969,37 +1003,44 @@ class Component extends DCLogic {
       { src: (window.__resources&&window.__resources.r_cat1)||'uploads/c/cat1.jpg', label: 'Folder', title: 'Rota Ceará', desc: 'Campanha — versão v2' },
       { src: (window.__resources&&window.__resources.r_cat2)||'uploads/c/cat2.jpg', label: 'E-mail Marketing', title: 'OCA Aprendizado', desc: 'Campanha de e-mail marketing para plataforma educacional' },
     ];
+    const MOTION_WORKS = [
+      { src: 'assets/motion-ocalab.mp4', label: 'Motion Graphic', title: 'OCA Lab', client: 'Rede OCA', desc: 'Motion simples para redes sociais. Sem áudio, sem locução. Animação institucional criada para o OCA Lab da Rede OCA.' },
+    ];
 
-    const currentSite = SITES[ci.sites];
-    const currentId   = ID_WORKS[ci.id];
-    const currentIg   = IG_POSTS[ci.ig];
-    const currentEv   = EVENTS[ci.ev];
-    const currentCat  = CAT_WORKS[ci.cat];
+    const currentSite   = SITES[ci.sites];
+    const currentId     = ID_WORKS[ci.id];
+    const currentIg     = IG_POSTS[ci.ig];
+    const currentEv     = EVENTS[ci.ev];
+    const currentCat    = CAT_WORKS[ci.cat];
+    const currentMotion = MOTION_WORKS[ci.motion];
 
-    const siteDots = makeDots(SITES.length,    'sites', ci.sites);
-    const idDots   = makeDots(ID_WORKS.length, 'id',    ci.id);
-    const igDots   = makeDots(IG_POSTS.length, 'ig',    ci.ig);
-    const evDots   = makeDots(EVENTS.length,   'ev',    ci.ev);
-    const catDots  = makeDots(CAT_WORKS.length,'cat',   ci.cat);
+    const siteDots   = makeDots(SITES.length,        'sites',  ci.sites);
+    const idDots     = makeDots(ID_WORKS.length,     'id',     ci.id);
+    const igDots     = makeDots(IG_POSTS.length,     'ig',     ci.ig);
+    const evDots     = makeDots(EVENTS.length,       'ev',     ci.ev);
+    const catDots    = makeDots(CAT_WORKS.length,    'cat',    ci.cat);
+    const motionDots = makeDots(MOTION_WORKS.length, 'motion', ci.motion);
 
     const igCounter = (ci.ig + 1) + ' / ' + IG_POSTS.length;
 
-    const siteImg = React.createElement('img', { src: currentSite.src, alt: currentSite.title, style: { width: '100%', display: 'block' } });
-    const idImg   = React.createElement('img', { src: currentId.src,   alt: currentId.title,   style: { width: '100%', display: 'block' } });
-    const igImg   = React.createElement('img', { src: currentIg.src,   alt: currentIg.title,   style: { width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' } });
-    const evImg   = React.createElement('img', { src: currentEv.src,   alt: currentEv.title,   style: { width: '100%', maxHeight: '480px', objectFit: 'contain', background: '#0a0a0a', display: 'block' } });
-    const catImg  = React.createElement('img', { src: currentCat.src,  alt: currentCat.title,  style: { width: '100%', display: 'block' } });
+    const siteImg    = React.createElement('img',   { src: currentSite.src,   alt: currentSite.title,   style: { width: '100%', display: 'block' } });
+    const idImg      = React.createElement('img',   { src: currentId.src,     alt: currentId.title,     style: { width: '100%', display: 'block' } });
+    const igImg      = React.createElement('img',   { src: currentIg.src,     alt: currentIg.title,     style: { width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' } });
+    const evImg      = React.createElement('img',   { src: currentEv.src,     alt: currentEv.title,     style: { width: '100%', maxHeight: '480px', objectFit: 'contain', background: '#0a0a0a', display: 'block' } });
+    const catImg     = React.createElement('img',   { src: currentCat.src,    alt: currentCat.title,    style: { width: '100%', display: 'block' } });
+    const motionVideo= React.createElement('video', { src: currentMotion.src, controls: true, muted: true, playsInline: true, style: { width: '100%', display: 'block', background: '#000', borderRadius: '12px 12px 0 0' } });
 
     return {
       cats, services, totalFmt, selectedCount, nomeDisplay, contatoDisplay, waLink,
-      currentSite, currentId, currentIg, currentEv, currentCat,
-      siteImg, idImg, igImg, evImg, catImg,
-      siteDots, idDots, igDots, evDots, catDots, igCounter,
-      prevSite: makeNav('sites', SITES.length,    -1), nextSite: makeNav('sites', SITES.length,    1),
-      prevId:   makeNav('id',    ID_WORKS.length, -1), nextId:   makeNav('id',    ID_WORKS.length, 1),
-      prevIg:   makeNav('ig',    IG_POSTS.length, -1), nextIg:   makeNav('ig',    IG_POSTS.length, 1),
-      prevEv:   makeNav('ev',    EVENTS.length,   -1), nextEv:   makeNav('ev',    EVENTS.length,   1),
-      prevCat:  makeNav('cat',   CAT_WORKS.length,-1), nextCat:  makeNav('cat',   CAT_WORKS.length,1),
+      currentSite, currentId, currentIg, currentEv, currentCat, currentMotion,
+      siteImg, idImg, igImg, evImg, catImg, motionVideo,
+      siteDots, idDots, igDots, evDots, catDots, motionDots, igCounter,
+      prevSite:   makeNav('sites',  SITES.length,        -1), nextSite:   makeNav('sites',  SITES.length,        1),
+      prevId:     makeNav('id',     ID_WORKS.length,     -1), nextId:     makeNav('id',     ID_WORKS.length,     1),
+      prevIg:     makeNav('ig',     IG_POSTS.length,     -1), nextIg:     makeNav('ig',     IG_POSTS.length,     1),
+      prevEv:     makeNav('ev',     EVENTS.length,       -1), nextEv:     makeNav('ev',     EVENTS.length,       1),
+      prevCat:    makeNav('cat',    CAT_WORKS.length,    -1), nextCat:    makeNav('cat',    CAT_WORKS.length,    1),
+      prevMotion: makeNav('motion', MOTION_WORKS.length, -1), nextMotion: makeNav('motion', MOTION_WORKS.length, 1),
       onNomeInput:    (e) => this.setState({ nome:    e.target.value }),
       onContatoInput: (e) => this.setState({ contato: e.target.value }),
     };
